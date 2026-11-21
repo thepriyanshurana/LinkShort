@@ -1,9 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Analytics from "./Analytics";
 import QRCode from "./QRCode";
 import "./App.css";
+
+const API_URL = "https://linkshort-backend-upje.onrender.com";
 
 function App() {
   const [page, setPage] = useState("home");
@@ -26,29 +28,50 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   // Authentication config
-  const getAuthConfig = () => {
-    return {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token")
-      }
-    };
-  };
+  const getAuthConfig = () => ({
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+  });
 
   // Fetch user's links
   const fetchUserUrls = async () => {
     try {
       const response = await axios.get(
-        "https://linkshort-backend-upje.onrender.com/my-links",
+        `${API_URL}/my-links`,
         getAuthConfig()
       );
 
-      setUrls(response.data);
+      setUrls(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
+      console.log("Fetch links error:", error);
+      setUrls([]);
       setMessage(
         error.response?.data?.message || "Unable to fetch your links"
       );
     }
   };
+
+  // Restore login session after refresh
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
+    if (savedToken && savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+
+        setUser(parsedUser);
+        setPage("dashboard");
+        fetchUserUrls();
+      } catch (error) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
+    } else if (savedToken && !savedUser) {
+      localStorage.removeItem("token");
+    }
+  }, []);
 
   // Signup
   const handleSignup = async () => {
@@ -59,7 +82,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "https://linkshort-backend-upje.onrender.com/api/auth/signup",
+        `${API_URL}/api/auth/signup`,
         { name, email, password }
       );
 
@@ -81,11 +104,12 @@ function App() {
 
     try {
       const response = await axios.post(
-        "https://linkshort-backend-upje.onrender.com/api/auth/login",
+        `${API_URL}/api/auth/login`,
         { email, password }
       );
 
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
 
       setUser(response.data.user);
       setPage("dashboard");
@@ -113,7 +137,7 @@ function App() {
       setShortUrl("");
 
       const response = await axios.post(
-        "https://linkshort-backend-upje.onrender.com/create",
+        `${API_URL}/create`,
         {
           originalUrl: originalUrl,
           customAlias: customAlias.trim(),
@@ -159,7 +183,7 @@ function App() {
 
     try {
       await axios.delete(
-        "https://linkshort-backend-upje.onrender.com/" + id,
+        `${API_URL}/${id}`,
         getAuthConfig()
       );
 
@@ -189,6 +213,7 @@ function App() {
   // Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
     setUser(null);
     setUrls([]);
@@ -200,7 +225,7 @@ function App() {
   };
 
   const totalClicks = urls.reduce((total, url) => {
-    return total + url.clicks;
+    return total + (Number(url.clicks) || 0);
   }, 0);
 
   const today = new Date().toLocaleDateString("en-CA");
@@ -550,8 +575,7 @@ function App() {
                 </div>
 
                 {urls.map((url) => {
-                  const shortLink =
-                    "https://linkshort-backend-upje.onrender.com/" + url.shortCode;
+                  const shortLink = `${API_URL}/${url.shortCode}`;
 
                   return (
                     <div className="link-item" key={url._id}>
