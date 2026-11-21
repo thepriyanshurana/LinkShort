@@ -38,7 +38,7 @@ function App() {
   const fetchUserUrls = async () => {
     try {
       const response = await axios.get(
-        "https://linkshort-backend-upje.onrender.com",
+        "https://linkshort-backend-upje.onrender.com/my-links",
         getAuthConfig()
       );
 
