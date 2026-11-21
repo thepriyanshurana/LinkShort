@@ -146,7 +146,14 @@ function App() {
         getAuthConfig()
       );
 
-      setShortUrl(response.data.shortUrl);
+      // Always show the live backend URL
+      const generatedCode = response.data.shortUrl
+        .split("/")
+        .filter(Boolean)
+        .pop();
+
+      setShortUrl(`${API_URL}/${generatedCode}`);
+
       setOriginalUrl("");
       setCustomAlias("");
       setExpiresAt("");
