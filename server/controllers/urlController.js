@@ -90,7 +90,7 @@ export const createUrl = async (req, res) => {
 
     res.status(201).json({
       message: "Short URL created",
-      shortUrl: "http://localhost:5000/" + shortCode,
+      shortUrl: "http://https://linkshort-backend-upje.onrender.com/" + shortCode,
       originalUrl: finalUrl,
       expiresAt: expiryDate
     });

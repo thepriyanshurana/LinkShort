@@ -11,7 +11,7 @@ function Analytics({ url, onBack }) {
     const fetchAnalytics = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/analytics/${url._id}`,
+          `https://linkshort-backend-upje.onrender.com/analytics/${url._id}`,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token")

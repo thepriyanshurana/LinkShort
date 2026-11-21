@@ -38,7 +38,7 @@ function App() {
   const fetchUserUrls = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/my-links",
+        "https://linkshort-backend-upje.onrender.com",
         getAuthConfig()
       );
 
@@ -59,7 +59,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        "https://linkshort-backend-upje.onrender.com/api/auth/signup",
         { name, email, password }
       );
 
@@ -81,7 +81,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://linkshort-backend-upje.onrender.com/api/auth/login",
         { email, password }
       );
 
@@ -113,7 +113,7 @@ function App() {
       setShortUrl("");
 
       const response = await axios.post(
-        "http://localhost:5000/create",
+        "https://linkshort-backend-upje.onrender.com/create",
         {
           originalUrl: originalUrl,
           customAlias: customAlias.trim(),
@@ -159,7 +159,7 @@ function App() {
 
     try {
       await axios.delete(
-        "http://localhost:5000/" + id,
+        "https://linkshort-backend-upje.onrender.com/" + id,
         getAuthConfig()
       );
 
@@ -551,7 +551,7 @@ function App() {
 
                 {urls.map((url) => {
                   const shortLink =
-                    "http://localhost:5000/" + url.shortCode;
+                    "https://linkshort-backend-upje.onrender.com/" + url.shortCode;
 
                   return (
                     <div className="link-item" key={url._id}>
